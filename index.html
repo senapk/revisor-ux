@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protótipo — Avaliação de trabalhos</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#1d2939;background:#f5f7fa}*{box-sizing:border-box}body{margin:0;padding:32px 16px}.wrap{max-width:740px;margin:auto}.card{background:white;border:1px solid #e1e6ed;border-radius:14px;padding:30px;box-shadow:0 6px 25px #10182809}h1{font-size:25px;margin:0 0 8px}p{line-height:1.5}.sub,.hint{color:#64748b}.sub{margin:0 0 28px}.field{margin-top:23px}label,.heading{display:block;font-weight:650;margin-bottom:9px}.required{color:#c53636}.choices{display:grid;gap:8px}.choice{display:flex;gap:12px;align-items:center;padding:14px;border:1px solid #d8dfe8;border-radius:10px;cursor:pointer;font-weight:500}.choice:has(input:checked){border-color:#2563eb;background:#eff6ff}.choice input{accent-color:#2563eb}textarea{width:100%;min-height:108px;border:1px solid #cbd5e1;border-radius:9px;padding:12px;font:inherit;resize:vertical}textarea:focus{outline:2px solid #93c5fd;border-color:#2563eb}.hint{font-size:13px;margin:7px 0}.actions{margin-top:28px;display:flex;gap:10px;flex-wrap:wrap}button{background:#175cd3;color:white;border:0;padding:12px 18px;border-radius:9px;font:inherit;font-weight:600;cursor:pointer}button.secondary{background:white;color:#344054;border:1px solid #cbd5e1}.message{margin-top:18px;padding:14px;border-radius:9px;background:#eff6ff;color:#1849a9;white-space:pre-wrap;display:none}.error{background:#fff1f2;color:#9f1239}.foot{font-size:13px;color:#64748b;margin-top:14px}@media(max-width:520px){.card{padding:20px}body{padding:14px}}</style>
+</head>
+<body><main class="wrap"><section class="card">
+<h1>Avaliação de trabalhos</h1><p class="sub">Protótipo de interface para revisores — demonstração sem envio a servidor.</p>
+<form id="reviewForm" novalidate>
+<div class="heading">1. Parecer do revisor <span class="required">*</span></div>
+<div class="choices" role="radiogroup" aria-label="Parecer">
+<label class="choice"><input type="radio" name="decision" value="Aprovado"> Aprovado</label>
+<label class="choice"><input type="radio" name="decision" value="Pendente de correções" checked> Pendente de correções</label>
+<label class="choice"><input type="radio" name="decision" value="Reprovado"> Reprovado</label>
+</div>
+<div class="field"><label for="suggestions">2. Sugestões de melhoria <span class="hint">(opcional)</span></label><textarea id="suggestions" placeholder="Recomendações que não são condições para aprovação."></textarea><p class="hint">Sugestões não precisam ser implementadas para a aprovação.</p></div>
+<div class="field" id="correctionsGroup"><label for="corrections">3. Exigências de correção <span class="required">*</span></label><textarea id="corrections" placeholder="Liste objetivamente o que deve ser corrigido para que o trabalho seja aprovado."></textarea><p class="hint">Descreva problemas verificáveis. Evite expressões vagas como “melhorar a metodologia”.</p></div>
+<div class="field" id="justificationGroup" hidden><label for="justification">3. Justificativa da reprovação <span class="required">*</span></label><textarea id="justification" placeholder="Explique por que os problemas impedem a aprovação e não podem ser resolvidos nesta etapa."></textarea><p class="hint">Diferencie problemas sanáveis de motivos para reprovação.</p></div>
+<div class="actions"><button type="submit">Visualizar parecer</button><button type="button" class="secondary" id="copy">Copiar parecer</button><button type="reset" class="secondary">Limpar</button></div>
+<div id="message" class="message" role="status" aria-live="polite"></div>
+</form></section><p class="foot">Este protótipo funciona totalmente offline. Os dados não são enviados nem armazenados.</p></main>
+<script>
+const form=document.querySelector('#reviewForm'),correctionsGroup=document.querySelector('#correctionsGroup'),justificationGroup=document.querySelector('#justificationGroup'),message=document.querySelector('#message');
+function decision(){return form.elements.decision.value}
+function sync(){const d=decision();correctionsGroup.hidden=d!=='Pendente de correções';justificationGroup.hidden=d!=='Reprovado';document.querySelector('#corrections').required=d==='Pendente de correções';document.querySelector('#justification').required=d==='Reprovado';message.style.display='none'}
+function result(){const d=decision(),suggestions=document.querySelector('#suggestions').value.trim(),corrections=document.querySelector('#corrections').value.trim(),justification=document.querySelector('#justification').value.trim();if(d==='Pendente de correções'&&!corrections)return {error:'Descreva as exigências de correção antes de continuar.'};if(d==='Reprovado'&&!justification)return {error:'Justifique a reprovação antes de continuar.'};return {text:`Parecer: ${d}\n\nSugestões de melhoria: ${suggestions||'Nenhuma'}${d==='Pendente de correções'?`\n\nExigências de correção: ${corrections}`:''}${d==='Reprovado'?`\n\nJustificativa da reprovação: ${justification}`:''}`}}
+function show(value,err=false){message.textContent=value;message.classList.toggle('error',err);message.style.display='block'}
+form.addEventListener('change',e=>{if(e.target.name==='decision')sync()});form.addEventListener('reset',()=>setTimeout(sync,0));form.addEventListener('submit',e=>{e.preventDefault();const r=result();show(r.error||r.text,!!r.error)});document.querySelector('#copy').addEventListener('click',async()=>{const r=result();if(r.error){show(r.error,true);return}try{await navigator.clipboard.writeText(r.text);show('Parecer copiado.\n\n'+r.text)}catch{show('Não foi possível copiar automaticamente. Visualize e selecione o texto abaixo:\n\n'+r.text)}});sync();
+</script></body></html>
