@@ -4,37 +4,105 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Protótipo — Avaliação de trabalhos</title>
 <style>
-:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#1d2939;background:#f5f7fa}*{box-sizing:border-box}body{margin:0;padding:32px 16px}.wrap{max-width:740px;margin:auto}.card{background:white;border:1px solid #e1e6ed;border-radius:14px;padding:30px;box-shadow:0 6px 25px #10182809}h1{font-size:25px;margin:0 0 8px}p{line-height:1.5}.sub,.hint{color:#64748b}.sub{margin:0 0 28px}.field{margin-top:23px}label,.heading{display:block;font-weight:650;margin-bottom:9px}.required{color:#c53636}.field:has(textarea:disabled) .required{display:none}.choices{display:grid;gap:8px}.choice{display:flex;gap:12px;align-items:center;padding:14px;border:1px solid #d8dfe8;border-radius:10px;cursor:pointer;font-weight:500}.choice:has(input:checked){border-color:#2563eb;background:#eff6ff}.choice input{accent-color:#2563eb}textarea{width:100%;min-height:108px;border:1px solid #cbd5e1;border-radius:9px;padding:12px;font:inherit;resize:vertical}textarea:focus{outline:2px solid #93c5fd;border-color:#2563eb}textarea:disabled{background:#f2f4f7;color:#667085;text-decoration:line-through;text-decoration-thickness:2px;cursor:not-allowed}textarea:disabled::placeholder{text-decoration:none;color:#98a2b3}.field:has(textarea:disabled) label{color:#667085}.hint{font-size:13px;margin:7px 0}.organization{margin-top:30px;padding-top:26px;border-top:1px solid #d8dfe8}.organization .choices{grid-template-columns:repeat(2,minmax(0,1fr))}.organization .field{margin-top:16px}.actions{margin-top:28px;display:flex;gap:10px;flex-wrap:wrap}button{background:#175cd3;color:white;border:0;padding:12px 18px;border-radius:9px;font:inherit;font-weight:600;cursor:pointer}button.secondary{background:white;color:#344054;border:1px solid #cbd5e1}.message{margin-top:18px;padding:14px;border-radius:9px;background:#eff6ff;color:#1849a9;white-space:pre-wrap;display:none}.error{background:#fff1f2;color:#9f1239}.foot{font-size:13px;color:#64748b;margin-top:14px}@media(max-width:520px){.card{padding:20px}body{padding:14px}}</style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#1d2939;background:#f5f7fa}*{box-sizing:border-box}body{margin:0;padding:32px 16px}.wrap{max-width:740px;margin:auto}.card{background:white;border:1px solid #e1e6ed;border-radius:14px;padding:30px;box-shadow:0 6px 25px #10182809}h1{font-size:25px;margin:0 0 8px}p{line-height:1.5}.sub,.hint{color:#64748b}.sub{margin:0 0 28px}.field{margin-top:23px}label,.heading{display:block;font-weight:650;margin-bottom:9px}.field-status{font-size:13px;color:#64748b;font-weight:400}.field-status.is-pending{color:#b42318}.field-status.is-complete{color:#067647}.choices{display:grid;gap:8px}.choice{display:flex;gap:12px;align-items:center;padding:14px;border:1px solid #d8dfe8;border-radius:10px;cursor:pointer;font-weight:500}.choice:has(input:checked){border-color:#2563eb;background:#eff6ff}.choice input{accent-color:#2563eb}.choices[aria-invalid="true"]{border-left:3px solid #b42318;padding-left:10px}textarea{width:100%;min-height:108px;border:1px solid #cbd5e1;border-radius:9px;padding:12px;font:inherit;resize:vertical}textarea:focus{outline:2px solid #93c5fd;border-color:#2563eb}textarea[aria-invalid="true"]{border-color:#b42318}textarea:disabled{background:#f2f4f7;color:#667085;text-decoration:line-through;text-decoration-thickness:2px;cursor:not-allowed}textarea:disabled::placeholder{text-decoration:none;color:#98a2b3}.field:has(textarea:disabled) label{color:#667085}.hint{font-size:13px;margin:7px 0}.field-error{font-size:13px;color:#b42318;font-weight:400;margin-left:8px}.field-error[hidden]{display:none}.actions{margin-top:28px;display:flex;gap:10px;flex-wrap:wrap}button{background:#175cd3;color:white;border:0;padding:12px 18px;border-radius:9px;font:inherit;font-weight:600;cursor:pointer}button.secondary{background:white;color:#344054;border:1px solid #cbd5e1}.message{margin-top:18px;padding:14px;border-radius:9px;background:#eff6ff;color:#1849a9;white-space:pre-wrap;display:none}@media(max-width:520px){.card{padding:20px}body{padding:14px}}</style>
 </head>
 <body><main class="wrap"><section class="card">
-<h1>Avaliação de trabalhos</h1><p class="sub">Protótipo de interface para revisores — demonstração sem envio a servidor.</p>
+<h1>Avaliação de trabalhos</h1><p class="sub">Protótipo para revisores. As respostas não são enviadas nem armazenadas.</p>
 <form id="reviewForm" novalidate>
-<div class="heading">Parecer do revisor <span class="required">*</span></div>
-<div class="choices" role="radiogroup" aria-label="Parecer">
+<div class="heading">Parecer do revisor <span class="field-status" id="decisionStatus">(obrigatório)</span><span class="field-error" id="decisionError" hidden></span></div>
+<div class="choices" role="radiogroup" aria-label="Parecer" aria-describedby="decisionError" id="decisionChoices">
 <label class="choice"><input type="radio" name="decision" value="Aprovado"> Aprovado</label>
-<label class="choice"><input type="radio" name="decision" value="Pendente de correções" checked> Pendente de correções</label>
+<label class="choice"><input type="radio" name="decision" value="Pendente de correções"> Pendente de correções</label>
 <label class="choice"><input type="radio" name="decision" value="Reprovado"> Reprovado</label>
 </div>
-<div class="field"><label for="suggestions">Sugestões de melhoria <span class="hint">(opcional)</span></label><textarea id="suggestions" placeholder="Recomendações que não são condições para aprovação."></textarea><p class="hint">Sugestões não precisam ser implementadas para a aprovação.</p></div>
-<div class="field" id="correctionsGroup"><label for="corrections">Exigências de correção <span class="required">*</span></label><textarea id="corrections" placeholder="Liste objetivamente o que deve ser corrigido para que o trabalho seja aprovado."></textarea><p class="hint">Descreva problemas verificáveis. Evite expressões vagas como “melhorar a metodologia”.</p></div>
-<div class="field" id="justificationGroup"><label for="justification">Justificativa da reprovação <span class="required">*</span></label><textarea id="justification" placeholder="Explique por que os problemas impedem a aprovação e não podem ser resolvidos nesta etapa."></textarea><p class="hint">Diferencie problemas sanáveis de motivos para reprovação.</p></div>
-<section class="organization" aria-label="Mensagem à organização">
-<div class="heading" id="organizationQuestion">Possui alguma notificação exclusiva para coordenação do evento?</div>
-<div class="choices" role="radiogroup" aria-labelledby="organizationQuestion">
-<label class="choice"><input type="radio" name="organizationNotice" value="nao" checked> Não</label>
-<label class="choice"><input type="radio" name="organizationNotice" value="sim"> Sim</label>
-</div>
-<div class="field" id="organizationMessageGroup"><label for="organizationMessage">Mensagem à coordenação <span class="required">*</span></label><textarea id="organizationMessage" aria-describedby="organizationGuidance" placeholder="Ex.: conflito de interesses, arquivo ilegível ou dúvida sobre as regras do evento." disabled></textarea><p class="hint" id="organizationGuidance">Use para questões administrativas ou reservadas.</p></div>
-</section>
+<div class="field"><label for="suggestions">Sugestões de melhoria <span class="field-status">(opcional)</span></label><textarea id="suggestions" placeholder="Ex.: esclareça os objetivos ou organize melhor os resultados."></textarea><p class="hint">Estas sugestões não condicionam a aprovação.</p></div>
+<div class="field"><label for="corrections">Exigências de correção <span class="field-status" id="correctionsStatus"></span><span class="field-error" id="correctionsError" hidden></span></label><textarea id="corrections" aria-describedby="correctionsHint correctionsError" placeholder="Ex.: inclua o tamanho da amostra na seção de métodos."></textarea><p class="hint" id="correctionsHint">Descreva problemas verificáveis. Evite pedidos vagos como “melhorar a metodologia”.</p></div>
+<div class="field"><label for="justification">Justificativa da reprovação <span class="field-status" id="justificationStatus"></span><span class="field-error" id="justificationError" hidden></span></label><textarea id="justification" aria-describedby="justificationHint justificationError" placeholder="Explique por que os problemas impedem a aprovação nesta etapa."></textarea><p class="hint" id="justificationHint">Diferencie problemas sanáveis de motivos para reprovação.</p></div>
 <div class="actions"><button type="submit">Visualizar parecer</button><button type="button" class="secondary" id="copy">Copiar parecer</button><button type="reset" class="secondary">Limpar</button></div>
 <div id="message" class="message" role="status" aria-live="polite"></div>
-</form></section><p class="foot">Este protótipo funciona totalmente offline. Os dados não são enviados nem armazenados.</p></main>
+</form></section></main>
 <script>
-const form=document.querySelector('#reviewForm'),corrections=document.querySelector('#corrections'),justification=document.querySelector('#justification'),organizationMessage=document.querySelector('#organizationMessage'),message=document.querySelector('#message');
+const form=document.querySelector('#reviewForm');
+const corrections=document.querySelector('#corrections');
+const justification=document.querySelector('#justification');
+const message=document.querySelector('#message');
+const decisionChoices=document.querySelector('#decisionChoices');
+
 function decision(){return form.elements.decision.value}
-function hasOrganizationMessage(){return form.elements.organizationNotice.value==='sim'}
-function sync(){const d=decision(),showOrganizationMessage=hasOrganizationMessage();corrections.disabled=d!=='Pendente de correções';justification.disabled=d!=='Reprovado';corrections.required=!corrections.disabled;justification.required=!justification.disabled;organizationMessage.disabled=!showOrganizationMessage;organizationMessage.required=showOrganizationMessage;message.style.display='none'}
-function result(){const d=decision(),suggestions=document.querySelector('#suggestions').value.trim(),correctionText=corrections.value.trim(),justificationText=justification.value.trim(),organizationText=hasOrganizationMessage()?organizationMessage.value.trim():'';if(d==='Pendente de correções'&&!correctionText)return {error:'Descreva as exigências de correção antes de continuar.'};if(d==='Reprovado'&&!justificationText)return {error:'Justifique a reprovação antes de continuar.'};if(hasOrganizationMessage()&&!organizationText)return {error:'Escreva a mensagem à coordenação ou selecione Não.'};return {text:`Parecer: ${d}\n\nSugestões de melhoria: ${suggestions||'Nenhuma'}${d==='Pendente de correções'?`\n\nExigências de correção: ${correctionText}`:''}${d==='Reprovado'?`\n\nJustificativa da reprovação: ${justificationText}`:''}`,organizationMessage:organizationText}}
-function show(value,err=false){message.textContent=value;message.classList.toggle('error',err);message.style.display='block'}
-form.addEventListener('change',e=>{if(e.target.name==='decision'||e.target.name==='organizationNotice')sync()});form.addEventListener('reset',()=>setTimeout(sync,0));form.addEventListener('submit',e=>{e.preventDefault();const r=result();show(r.error||`PARECER PARA O AUTOR\n${r.text}${r.organizationMessage?`\n\nMENSAGEM À ORGANIZAÇÃO\n${r.organizationMessage}`:''}`,!!r.error)});document.querySelector('#copy').addEventListener('click',async()=>{const r=result();if(r.error){show(r.error,true);return}try{await navigator.clipboard.writeText(r.text);show('Parecer copiado. A mensagem à organização não foi incluída.\n\n'+r.text)}catch{show('Não foi possível copiar automaticamente. Visualize e selecione o parecer abaixo:\n\n'+r.text)}});sync();
+
+function clearError(field){
+  document.querySelector(`#${field}Error`).hidden=true;
+  (field==='decision'?decisionChoices:document.querySelector(`#${field}`)).removeAttribute('aria-invalid');
+}
+
+function clearErrors(){['decision','corrections','justification'].forEach(clearError)}
+
+function updateStatuses(){
+  const d=decision();
+  const decisionStatus=document.querySelector('#decisionStatus');
+  decisionStatus.classList.toggle('is-pending',!d);
+  decisionStatus.classList.toggle('is-complete',!!d);
+  for(const [field,statusId] of [[corrections,'#correctionsStatus'],[justification,'#justificationStatus']]){
+    const status=document.querySelector(statusId);
+    status.textContent=field.disabled?(d?'(inativo para este parecer)':'(inativo até selecionar um parecer)'):'(obrigatório)';
+    status.classList.toggle('is-pending',!field.disabled&&!field.value.trim());
+    status.classList.toggle('is-complete',!field.disabled&&!!field.value.trim());
+  }
+}
+
+function sync(){
+  const d=decision();
+  corrections.disabled=d!=='Pendente de correções';
+  justification.disabled=d!=='Reprovado';
+  corrections.required=!corrections.disabled;
+  justification.required=!justification.disabled;
+  updateStatuses();
+  clearErrors();
+  message.style.display='none';
+}
+
+function result(){
+  const d=decision();
+  const suggestions=document.querySelector('#suggestions').value.trim();
+  const correctionText=corrections.value.trim();
+  const justificationText=justification.value.trim();
+  if(!d)return {field:'decision',error:'Selecione um parecer.'};
+  if(d==='Pendente de correções'&&!correctionText)return {field:'corrections',error:'Descreva as exigências de correção.'};
+  if(d==='Reprovado'&&!justificationText)return {field:'justification',error:'Justifique a reprovação.'};
+  return {text:`Parecer: ${d}\n\nSugestões de melhoria: ${suggestions||'Nenhuma'}${d==='Pendente de correções'?`\n\nExigências de correção: ${correctionText}`:''}${d==='Reprovado'?`\n\nJustificativa da reprovação: ${justificationText}`:''}`};
+}
+
+function showError(field,value){
+  clearErrors();
+  const error=document.querySelector(`#${field}Error`);
+  const target=field==='decision'?decisionChoices:document.querySelector(`#${field}`);
+  error.textContent=value;
+  error.hidden=false;
+  target.setAttribute('aria-invalid','true');
+  (field==='decision'?form.elements.decision[0]:target).focus();
+  message.style.display='none';
+}
+
+function show(value){message.textContent=value;message.style.display='block'}
+
+form.addEventListener('change',e=>{if(e.target.name==='decision')sync()});
+form.addEventListener('input',e=>{
+  if(e.target.id==='corrections'||e.target.id==='justification')clearError(e.target.id);
+  updateStatuses();
+  message.style.display='none';
+});
+form.addEventListener('reset',()=>setTimeout(sync,0));
+form.addEventListener('submit',e=>{
+  e.preventDefault();
+  const r=result();
+  if(r.error){showError(r.field,r.error);return}
+  show(`PARECER PARA O AUTOR\n${r.text}`);
+});
+document.querySelector('#copy').addEventListener('click',async()=>{
+  const r=result();
+  if(r.error){showError(r.field,r.error);return}
+  try{await navigator.clipboard.writeText(r.text);show(`Parecer copiado.\n\n${r.text}`)}
+  catch{show(`Não foi possível copiar automaticamente. Selecione o parecer abaixo:\n\n${r.text}`)}
+});
+sync();
 </script></body></html>
